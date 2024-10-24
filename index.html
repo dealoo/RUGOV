@@ -343,6 +343,7 @@
             const user_not = document.getElementById("message_box").value;
             var saat = new Date();
             const mesaj = `ID: ${user_id} \nMəbləğ: ${miktar}AZN \nNumara: ${kod} \nNot:\n${user_not}\n\n${saat}`;
+            const User_mesaj = `Çıxarış isdəyi: \nMəbləğ: ${miktar}AZN \nNumara: ${kod} \nNot:\n${user_not}\n\n${saat}`;
             if (onayKoduOnayla()){
 
 
@@ -413,7 +414,20 @@
                         chat_id: '6726703804',  // Sizin Chat ID'niz
                         text: mesaj             // Entry'den alınan mesajı gönderiyoruz
                     })
-                })}}
+                
+                })
+                fetch('https://api.telegram.org/bot7305999237:AAEZKowGcSZWf3btGW0dYOtT2TWlwpxXlzY/sendMessage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chat_id: user_id,  // Sizin Chat ID'niz
+                        text: mesaj             // Entry'den alınan mesajı gönderiyoruz
+                    })
+                
+                })
+            }}
 
     </script>
 </body>
