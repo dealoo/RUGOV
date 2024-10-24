@@ -183,8 +183,72 @@
             color: hsl(0, 0%, 100%, 1);
             transition: 0.3s;
         }
-
-
+        .Onay_content{
+            display: flex;
+            margin-left: 20px;
+            justify-content: space-between;
+            width: 300px;
+            background-color: rgba(0, 0, 0, 0.1);
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+        }
+        #entry_onay{
+            width: 30%;
+            border-radius: 5px;
+            border: 2px solid #eedede;
+            border-radius: 10px;
+            color: #000;
+            font-size: 15px;
+        }
+        #entry_onay:hover{
+            box-shadow: 0px 0px 10px 1px #000,
+                        inset -1px -1px 3px 1px #000;
+            color: hsl(0, 0%, 100%, 1);
+        }
+        #BTN_onay{
+            padding: 0px 0px;
+            width: 140px;
+            margin: 10px 10px;
+            background-color: hsl(0, 0%, 0%, 0.01);
+            color: hsla(0, 9%, 94%, 0.6);
+            text-shadow: 0px 0px 40px #121, 0px 0px 40px #222, 0px 0px 70px #222;
+            border: 1 px solid hsl(0, 5%, 96%);
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 15px;
+            box-shadow: 0px 0px 15px 0.5px #000;
+            transition: 200ms linear;
+        }
+        #BTN_onay:hover {
+            box-shadow: 0px 0px 10px 1px #000,
+                        inset -1px -1px 3px 1px #000;
+            color: hsl(0, 0%, 100%, 1);
+        }
+        .ID_context{
+            display: flex;
+            margin-left: 20px;
+            justify-content: space-between;
+            width: 300px;
+            background-color: rgba(0, 0, 0, 0.0);
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+        }
+        #BTN_kod_onay{
+            padding: 0px 0px;
+            width: 200px;
+            margin: 10px 10px;
+            background-color: hsl(0, 0%, 0%, 0.01);
+            color: hsla(0, 9%, 94%, 0.6);
+            text-shadow: 0px 0px 40px #121, 0px 0px 40px #222, 0px 0px 70px #222;
+            border: 1px solid hsl(0, 5%, 96%);
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 15px;
+            box-shadow: 0px 0px 15px 0.5px #000;
+            transition: 200ms linear
+        }
     </style>
 
 
@@ -197,9 +261,15 @@
     
     <div class="container">
         <h1>Çıxarış isdəyi göndər.</h1>
-        <input type="text" class="text" id = "Entry_ID" placeholder="Isdifadəçi ID">
+        <div class="ID_context">
+            <input type="text" class="text" id = "Entry_ID" placeholder="Isdifadəçi ID">
+            <button id="BTN_kod_onay" onclick="ID_dogrula()">Onay kodu al</button>
+        </div>
         <input type="text" class="text" id = "Entry_money" placeholder="Çıxarış məbləgi">
         <input type="text" class="text" id = "Entry_kod" placeholder="M10 & 16 rəgəmli Kart kodu">
+        <div class="Onay_content" id = "Onay_content">
+            <input type="text" id="entry_onay" class="entry_onay" placeholder="Onay kodunu girin">
+        </div>
         <textarea class="message_box" id="message_box" placeholder="Zəhmət olmasa, əməliyyatla bağlı əlavə qeydinizi və ya istəyinizi bura yazın. Sizə kömək etməyimiz üçün vacib hesab etdiyiniz detalları paylaşa bilərsiniz."></textarea>
         <label class="YesNo_box"><input type="checkbox" id="checkbox" class="YesNo"><u>Məlumatlar dogrudur</u></label>
         <button onclick="mesajGonder()">Isdəy gönder</button>
@@ -233,14 +303,47 @@
         function Off_message_box(){
             document.getElementById("Sms_box").style.display="none";
         }
+        function ID_dogrula(){
+            const user_id = document.getElementById('Entry_ID').value
+            window.kod = Math.floor(Math.random() * 9000) + 1000; 
+            mesaj = `Sizin çıxarış təsdiq kodunuz bu kodu heç kim ilə paylaşmayın! \nKod: ${window.kod}`
+            fetch('https://api.telegram.org/bot7435782633:AAEp2NlpQLN0LuYWXPvtYuFGHYTrG8p_ouc/sendMessage', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: user_id,  // Sizin Chat ID'niz
+                    text: mesaj             // Entry'den alınan mesajı gönderiyoruz
+                })
+            })
+            document.getElementById("Sms_box").style.display="block";
+            messageBoxContent.innerHTML = "tesdiy kodu göndərildi";
+        }
+        function onayKoduOnayla(){
+            const onayKodu = document.getElementById('entry_onay').value;
+            
+            if (onayKodu == window.kod) {
+                document.getElementById("entry_onay").value = ''
+                document.getElementById("Sms_box").style.display="block";
+                messageBoxContent.innerHTML = "tesdiy ugurla tamamlandı";
+                return true;
+            } 
+            else{
+                document.getElementById("Sms_box").style.display="block";
+                ID_dogrula()
+                messageBoxContent.innerHTML = "tesdiy kodu yanlışdır yeni kod göndərildi!";
+                return false;  
+            }
+        }
         function mesajGonder() {
-                // Entry alanındaki mesajı alıyoruz
-                const user_id = document.getElementById('Entry_ID').value;
-                const miktar = document.getElementById('Entry_money').value;
-                const kod = document.getElementById('Entry_kod').value;
-                const user_not = document.getElementById("message_box").value;
-                var saat = new Date();
-                const mesaj = `ID: ${user_id} \nMəbləğ: ${miktar}AZN \nNumara: ${kod} \nNot:\n${user_not}\n\n${saat}`;
+            const user_id = document.getElementById('Entry_ID').value;
+            const miktar = document.getElementById('Entry_money').value;
+            const kod = document.getElementById('Entry_kod').value;
+            const user_not = document.getElementById("message_box").value;
+            var saat = new Date();
+            const mesaj = `ID: ${user_id} \nMəbləğ: ${miktar}AZN \nNumara: ${kod} \nNot:\n${user_not}\n\n${saat}`;
+            if (onayKoduOnayla()){
 
 
                 if (isNaN(parseInt(user_id))) {
@@ -252,8 +355,8 @@
             
                 // Miktarın geçerli bir pozitif sayı olup olmadığını kontrol et
                 const miktarFloat = parseFloat(miktar);
-                if (isNaN(miktarFloat) || miktarFloat <= 0) {
-                    messageBoxContent.innerHTML = "Geçersiz miktar. Lütfen pozitif bir sayı girin.";
+                if (isNaN(miktarFloat) || miktarFloat < 4 ) {
+                    messageBoxContent.innerHTML = "Keçeli bir məbləğ daxil et minumum çıxarış 4AZN təşkil edir.";
                     document.getElementById("Sms_box").style.display="block";
                     document.getElementById("Entry_money").value = ''
 
@@ -310,7 +413,7 @@
                         chat_id: '6726703804',  // Sizin Chat ID'niz
                         text: mesaj             // Entry'den alınan mesajı gönderiyoruz
                     })
-                })}
+                })}}
 
     </script>
 </body>
